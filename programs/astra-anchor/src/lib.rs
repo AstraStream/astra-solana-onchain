@@ -26,4 +26,12 @@ pub mod astra_play {
     pub fn deposit_pool(ctx: Context<DepositPool>, amount: u64) -> Result<()> {
         deposit_pool::handler(ctx, amount)
     }
+
+    pub fn withdraw_pool(ctx: Context<WithdrawPool>, amount: u64) -> Result<()> {
+        withdraw_pool::handler(ctx, amount)
+    }
+
+    pub fn claim_reward(ctx: Context<ClaimReward>, username: String, role: String, amount: u64) -> Result<()> {
+        claim_reward::handler(ctx, username, role, amount)
+    }
 }

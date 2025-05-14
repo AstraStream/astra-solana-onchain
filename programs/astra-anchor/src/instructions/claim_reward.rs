@@ -1,5 +1,4 @@
 use anchor_lang::prelude::*;
-
 use anchor_spl::{associated_token::AssociatedToken, token_interface::{self, Mint, TokenAccount, TokenInterface, TransferChecked}};
 
 use crate::{
@@ -51,7 +50,7 @@ pub struct ClaimReward<'info> {
     pub system_program: Program<'info, System>
 }
 
-pub fn handler(ctx: Context<ClaimReward>, role: String, amount: u64) -> Result<()> {
+pub fn handler(ctx: Context<ClaimReward>, username: String, role: String, amount: u64) -> Result<()> {
     let claimer_account: &mut Account<Claimer> = &mut ctx.accounts.claimer_account;
     let pool_account: &mut Account<Pool> = &mut ctx.accounts.pool_account;
 
@@ -80,6 +79,7 @@ pub fn handler(ctx: Context<ClaimReward>, role: String, amount: u64) -> Result<(
     if claimer_account.total_claimed == 0 && claimer_account.last_claimed_at == 0 {
         // initialize claimer account
         claimer_account.address = *ctx.accounts.signer.key;
+        claimer_account.username = username;
         claimer_account.role = role;
         claimer_account.token_account = ctx.accounts.claimer_ata.key();
         claimer_account.total_claimed = amount;

@@ -12,10 +12,18 @@ pub use state::*;
 declare_id!("5CLJvW9rbWitTVZ7h1U1XotCVZV9J6QAk8bUKFJoweUW");
 
 #[program]
-pub mod astra_anchor {
+pub mod astra_play {
     use super::*;
 
-    pub fn initialize(ctx: Context<Initialize>) -> Result<()> {
-        initialize::handler(ctx)
+    pub fn create_master(ctx: Context<CreateMaster>) -> Result<()> {
+        create_master::handler(ctx)
+    }
+
+    pub fn create_pool(ctx: Context<CreatePool>) -> Result<()> {
+        create_pool::handler(ctx)
+    }
+
+    pub fn deposit_pool(ctx: Context<DepositPool>, amount: u64) -> Result<()> {
+        deposit_pool::handler(ctx, amount)
     }
 }

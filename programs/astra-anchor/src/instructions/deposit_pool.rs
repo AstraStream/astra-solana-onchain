@@ -1,9 +1,13 @@
 use anchor_lang::prelude::*;
-use anchor_spl::{associated_token::AssociatedToken, token_interface::{self, Mint, TokenAccount, TokenInterface, TransferChecked}};
+use anchor_spl::{
+    associated_token::AssociatedToken,
+    token_interface::{self, Mint, TokenAccount, TokenInterface, TransferChecked},
+};
 
 use crate::{
+    constants::LAMPORTS_PER_SOL,
+    error::ErrorCode,
     state::{Master, Pool},
-    error::ErrorCode
 };
 
 #[derive(Accounts)]
@@ -46,13 +50,16 @@ pub struct DepositPool<'info> {
 
     pub associated_token_program: Program<'info, AssociatedToken>,
     pub token_program: Interface<'info, TokenInterface>,
-    pub system_program: Program<'info, System>
+    pub system_program: Program<'info, System>,
 }
 
 pub fn handler(ctx: Context<DepositPool>, amount: u64) -> Result<()> {
     let pool_account: &mut Account<Pool> = &mut ctx.accounts.pool_account;
-    
-    require!(ctx.accounts.vault_ata.amount >= amount, ErrorCode::InsufficientFunds);
+
+    require!(
+        ctx.accounts.vault_ata.amount >= amount,
+        ErrorCode::InsufficientFunds
+    );
 
     // transfer token to pool
     token_interface::transfer_checked(
@@ -62,14 +69,18 @@ pub fn handler(ctx: Context<DepositPool>, amount: u64) -> Result<()> {
                 from: ctx.accounts.vault_ata.to_account_info(),
                 to: ctx.accounts.pool_token_account.to_account_info(),
                 mint: ctx.accounts.mint.to_account_info(),
-                authority: ctx.accounts.signer.to_account_info()
+                authority: ctx.accounts.signer.to_account_info(),
             },
         ),
         amount,
-        ctx.accounts.mint.decimals
+        ctx.accounts.mint.decimals,
     )?;
 
     // update pool state
-    pool_account.balance += amount;
-    Ok(())    
+    let amount_deposited: u64 = amount
+        .checked_div(LAMPORTS_PER_SOL as u64)
+        .ok_or(ErrorCode::MathOverflow)
+        .unwrap();
+    pool_account.balance += amount_deposited;
+    Ok(())
 }

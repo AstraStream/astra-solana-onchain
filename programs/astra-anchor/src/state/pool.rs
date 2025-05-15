@@ -8,5 +8,5 @@ pub struct Pool {
     pub total_claimed: u64,
     pub pool_token_account: Pubkey,
     pub pool_token_account_bump: u8,
-    pub bump: u8
+    pub bump: u8,
 }

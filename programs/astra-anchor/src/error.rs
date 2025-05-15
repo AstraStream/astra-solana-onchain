@@ -4,8 +4,10 @@ use anchor_lang::prelude::*;
 pub enum ErrorCode {
     #[msg("Unauthorized action")]
     Unauthorized,
-    #[msg("invalid mint")]
+    #[msg("Invalid mint")]
     InvalidMint,
+    #[msg("Math overflow error")]
+    MathOverflow,
     #[msg("insufficient funds")]
-    InsufficientFunds
+    InsufficientFunds,
 }
